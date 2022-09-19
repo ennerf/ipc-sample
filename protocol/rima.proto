@@ -1,0 +1,65 @@
+syntax = "proto2";
+
+option optimize_for = LITE_RUNTIME;
+
+option java_package = "us.hebi.protocol.rima";
+option java_generate_equals_and_hash = true;
+option java_multiple_files = true;
+
+package hebi.rima.proto;
+
+// specification of locations on which to form an image - assumes regular grid of locations
+message ImageGridSpec {
+  required uint32 num_x = 1;
+  required uint32 num_z = 2;
+  required float start_x = 3;
+  required float start_z = 4;
+  required float step_x = 5;
+  required float step_z = 6;
+}
+
+// Adaptive surface data, see TFM Toolbox documentation for details.
+message AdaptiveSurface {
+
+  // X0_out returns the x position of the first surface point.
+  required float X0_out = 1;
+
+  // DX_out returns the x distance between successive points.
+  required float DX_out = 2;
+
+  // surface_points_out must point to memory sufficient to store
+  // num_surface_points() float values.
+  repeated float surface_points = 3 [packed = true];
+
+}
+
+message SharedImageResult {
+
+  // Returns the ID of the sequence. This counts the number of
+  // sequences fired since device began pulsing.
+  required uint64 sequence_id = 1;
+
+  // number of encoder steps recorded by encoder 1
+  optional uint64 encoder1_count = 2;
+
+  // number of encoder steps recorded by encoder 2
+  optional uint64 encoder2_count = 3;
+
+  // Returns a pointer to image data.
+  repeated float image_data = 8  [packed = true];
+
+  // specification of locations on which to form an image - assumes regular grid of locations
+  required ImageGridSpec image_grid_spec = 10;
+
+  // added if adaptive surface data is included
+  optional AdaptiveSurface adaptive_surface = 11;
+
+}
+
+message ExplorerResponse {
+  // Interface for results given to image result callback function.
+  optional SharedImageResult shared_image_result = 1;
+}
+
+message ExplorerRequest {
+}
